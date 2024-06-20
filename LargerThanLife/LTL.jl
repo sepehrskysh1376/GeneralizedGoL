@@ -1,10 +1,13 @@
+
+# A 2D world with GoL Rules
+
+
 import REPL
 using Plots
 terminal = REPL.Terminals.TTYTerminal(string(), stdin, stdout, stderr)
 
-# A 2D world with GoL Rules
 
-    # Initializations
+    # Initialization of Kellner
 # K = [1 1 1 1 1
 #      1 1 1 1 1 
 #      1 1 0 1 1
@@ -22,7 +25,6 @@ A0 = [0 0 0 0 0 0 0 0 0
       0 0 0 0 0 0 0 0 0
       0 0 0 0 0 0 0 0 0]# The world!
 
-Nt = 10 # The number of time-steps
 
     # The function for initializing a world as an Array
 worldIni(nx::Int64, ny::Int64) = zeros(Int64, nx, ny)
@@ -298,7 +300,7 @@ end
 
 
     # A function for evolving the world
-function worldSimulation(A0::Array, Nt::Int64)
+function worldSimulation(A0::Array, Nt::Int64, neighborMode::String, r::Int64)
     """
     Input:
         | A0    : The Initial world (configuration)
@@ -312,11 +314,11 @@ function worldSimulation(A0::Array, Nt::Int64)
     worldTimeArray[:, :, 1] = A0
     println(1) 
         # Updating
-    G  = worldRule(A0, "square", 1)
+    G  = worldRule(A0, neighborMode, r)
     Ai = worldCorrection(A0 + G)
     worldTimeArray[:, :, 2] = Ai
     for i in 3:Nt
-        G   = worldRule(Ai, "square", 1)
+        G   = worldRule(Ai, neighborMode, r)
         Ai  = worldCorrection(Ai + G)
         worldTimeArray[:, :, i] = Ai
     end
@@ -344,17 +346,38 @@ function main()
     print("\t\t1. You change the configuration inside the file which the variable name is 'A' (1)\n")
     print("\t\t2. Initialize a NxM array consisting of zeros and change the numbers manually (2)\n")
     print("\t\t3. You have a file from the before and want to implement it as initial configuration (3)\n\n")
-    print("* The number of time-steps and K, are in the source file, change them in the GoL.jl file.\n\n")
+    
     print("Which one do you want to perform?\n(1/2/3)> "); ans = readline()
 
+        # The Amount of the time-steps
+    print("How many time-steps do you want to use?\n> "); Nt = parse(Int64, readline()) 
 
+        # The neighbor modes
+    print("Which neighbor mode do you want?")
+    print("
+    circle: [0 0 0 1 0 0 0     ---> For example for r = 3
+             0 1 1 1 1 1 0     ---> m: The main cell
+             0 1 1 1 1 1 0
+             1 1 1 m 1 1 1
+             0 1 1 1 1 1 0
+             0 1 1 1 1 1 0
+             0 0 0 1 0 0 0]
+    square: [0 0 0 0 0 0 0     ---> For example for r = 2
+             0 1 1 1 1 1 0     ---> m: The main cell
+             0 1 1 1 1 1 0
+             0 1 1 m 1 1 0
+             0 1 1 1 1 1 0
+             0 1 1 1 1 1 0
+             0 0 0 0 0 0 0]\n\n(square/circle)> "); neighborMode = readline()
+
+        # The radius or distance
+    print("What distance do you want to contain your neighbor list?\n>(1 for Game of Life)> "); r = parse(Int64, readline())
         # Choosing between Heatmap animation or Termianl Animation
-
     print("How much time do you prefer between each frames? (Recommendation: 0.1, how lower you set, faster it get!!!)\n> "); speed = parse(Float64, readline())
 
         # The Options for performing simulation
     if ans == "1"
-        world = worldSimulation(A0, Nt)
+        world = worldSimulation(A0, Nt, neighborMode, r)
         
         print("Terminal Animation or Heatmap Animation:\n(t/h)> "); anime = readline()
         if anime == "t"
@@ -374,7 +397,7 @@ function main()
         ans = readline()
         if ans == ""    # If pressing 'ENTER', it proceeds.
             A = worldRead(file)
-            world = worldSimulation(A, Nt)
+            world = worldSimulation(A, Nt, neighborMode, r)
             print("Terminal Animation or Heatmap Animation:\n(t/h)> "); anime = readline()
             if anime == "t"
                 worldTerminalAnime(world, speed, "2.txt", Nt)
@@ -386,7 +409,7 @@ function main()
     elseif ans == "3"
         print("Which file do you want to perform Game of Life on it?\n> "); name = readline()
         A = worldRead(name)
-        world = worldSimulation(A, Nt)
+        world = worldSimulation(A, Nt, neighborMode, r)
         print("Terminal Animation or Heatmap Animation:\n(t/h)> "); anime = readline()
         if anime == "t"
             worldTerminalAnime(world, speed, "2.txt", Nt)
