@@ -23,7 +23,7 @@
 | README.md | The MarkDown file for explaining all these things. |
 
 ## How to use it (Install-ish)
-- Install Julia and the packages needed by:
+- Install Julia and the packages needed by: (For now this part is working just for Ubuntu users)
     ```
     $ bash ./ltl.sh
     ```
