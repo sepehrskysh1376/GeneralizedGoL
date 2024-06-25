@@ -9,6 +9,8 @@
 | ----- | ----------- |
 | LTL.jl | Whole program in one file |
 | main.jl | The user interface program |
+| ltl.sh | Installation run |
+| install.jl | Installation code |
 | 1.txt, 2.txt, 3.txt | text files that contain the Unicode characters for each types of cells (Alive or Dead) which are like this |
     ```
     1 <the Alive character> 
@@ -21,7 +23,10 @@
 | README.md | The MarkDown file for explaining all these things. |
 
 ## How to use it (Install-ish)
-- Install Julia (Obviously!!!)
+- Install Julia and the packages needed by:
+    ```
+    $ bash ./ltl.sh
+    ```
 - run it like this:
     ```
     $ julia main.jl
